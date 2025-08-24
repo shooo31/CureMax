@@ -1,0 +1,42 @@
+# Python / virtualenv
+venv/
+ENV/
+env/
+*.pyc
+_pycache_/
+*.pyo
+*.pyd
+*.egg-info/
+.build/
+
+# IDE
+.vscode/
+.idea/
+
+# Local files
+uploads/
+tmp/
+.DS_Store
+
+# Environment / secrets
+.env
+*.env
+
+# Unstage any accidentally added build/venv stuff
+git rm -r --cached Backend/venv venv _pycache_ */_pycache_ *.pyc 2>$null
+
+# Make sure .gitignore has the right entries
+@"
+# Virtual envs / caches
+venv/
+Backend/venv/
+_pycache_/
+*.pyc
+
+# Secrets
+.env
+.env.*
+Backend/.env
+Backend/.env.*
+uploads/
+"@ | Out-File -Encoding utf8 .gitignore

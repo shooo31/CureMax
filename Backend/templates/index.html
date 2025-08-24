@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CureMax | Your Healthcare ChatBot</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="page">
+    <!-- Chat column -->
+    <section class="chat-container">
+      <header class="chat-header">
+        <div class="brand">
+          <img class="logo" src="{{ url_for('static', filename='curemax_logo.png') }}" alt="CureMax logo">
+          <div>
+            <h1>CureMax</h1>
+            <small>Your Healthcare ChatBot</small>
+          </div>
+        </div>
+
+        <button id="theme-toggle" class="theme-toggle" aria-pressed="false" title="Toggle light/dark">
+          <!-- sun -->
+          <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+            <path d="M12 4V2M12 22v-2M4.93 4.93L3.52 3.52M20.48 20.48l-1.41-1.41M4 12H2m20 0h-2M4.93 19.07l-1.41 1.41M20.48 3.52l-1.41 1.41"/>
+            <circle cx="12" cy="12" r="4"></circle>
+          </svg>
+          <!-- moon -->
+          <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+          </svg>
+        </button>
+      </header>
+
+      <main id="chat-box" class="chat-box"></main>
+
+      <footer class="input-bar">
+        <input id="user-input" type="text" placeholder="Type your message..." autocomplete="off"/>
+
+        <!-- Send -->
+        <button id="send-btn" class="btn primary" title="Send" aria-label="Send">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+            <path d="M2 21l20-9L2 3v7l14 2-14 2v7z"/>
+          </svg>
+        </button>
+
+        <!-- Mic -->
+        <button id="mic-btn" class="btn" title="Voice input" aria-label="Voice input">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+            <path d="M12 14a3 3 0 003-3V6a3 3 0 10-6 0v5a3 3 0 003 3z"/>
+            <path d="M19 11a7 7 0 01-14 0M12 18v3"/>
+          </svg>
+        </button>
+
+        <!-- TTS -->
+        <label id="voice-output-label" class="btn" title="Voice output" aria-label="Voice output">
+          <input id="voice-output" type="checkbox"/>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+            <path d="M3 10v4a2 2 0 002 2h3l4 3V7l-4 3H5a2 2 0 00-2 2z"/>
+            <path d="M16 8a5 5 0 010 8M18.5 6a8 8 0 010 12"/>
+          </svg>
+        </label>
+
+        <!-- Share -->
+        <button id="share-btn" class="btn" title="Share image" aria-label="Share image">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2V9a2 2 0 012-2h6l2 2h6a2 2 0 012 2z"/>
+            <path d="M16 13l-3 3-2-2-3 3"/>
+          </svg>
+        </button>
+        <!-- hidden pickers used by the share menu -->
+        <input id="file-input" type="file" accept="image/*" hidden>
+        <input id="camera-input" type="file" accept="image/*" capture="environment" hidden>
+      </footer>
+    </section>
+
+    <!-- Map column -->
+    <aside id="map-container">
+      <iframe
+        id="map-frame"
+        src="https://www.google.com/maps?q=clinics%20near%20me%2C%20Mauritius&output=embed"
+        allowfullscreen
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </aside>
+
+    <!-- Info grid under both columns -->
+    <section class="info-grid">
+      <article class="card">
+        <h2>About CureMax</h2>
+        <p>CureMax offers supportive, practical health guidance, gentle triage, breathing tools, and quick care for anytime need. It is not a diagnosis tool — for emergencies seek local services.</p>
+      </article>
+
+      <article class="card">
+        <h2>Medicine Reminders</h2>
+        <div class="remind-row">
+          <input id="med-name" class="input" placeholder="Medicine name (e.g., Metfo)"/>
+          <input id="med-dose" class="input" placeholder="Dose (e.g., 500 mg)"/>
+          <input id="med-time" class="input" type="time" value="08:00"/>
+          <label class="chk"><input id="med-repeat" type="checkbox" checked> Repeat daily</label>
+          <button id="add-reminder" class="btn primary">Add reminder</button>
+        </div>
+        <ul id="reminder-list" class="reminder-list">
+          <li class="muted">No reminders yet.</li>
+        </ul>
+      </article>
+
+      <!-- QUIZ replaces the old breathing pacer -->
+      <article class="card">
+        <h2>Health Quiz</h2>
+        <div id="quiz-card" class="quiz">
+          <div id="quiz-progress" class="quiz-progress">Question 1 of 10</div>
+          <div id="quiz-q" class="quiz-q">...</div>
+          <div id="quiz-opts" class="quiz-opts"></div>
+          <div class="quiz-actions">
+            <button id="quiz-next" class="btn primary" disabled>Next</button>
+            <button id="quiz-restart" class="btn">Restart</button>
+          </div>
+          <div id="quiz-score" class="quiz-score"></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Health News</h2>
+        <ul id="news-list" class="news-list">
+          <li class="muted">Loading…</li>
+        </ul>
+      </article>
+    </section>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
